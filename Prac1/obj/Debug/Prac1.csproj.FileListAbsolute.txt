@@ -1,0 +1,6 @@
+C:\Users\Wouter\Desktop\Computationele Intelligentie\Computationele-Intelligentie-Prac-1\Prac1\bin\Debug\Prac1.exe.config
+C:\Users\Wouter\Desktop\Computationele Intelligentie\Computationele-Intelligentie-Prac-1\Prac1\bin\Debug\Prac1.exe
+C:\Users\Wouter\Desktop\Computationele Intelligentie\Computationele-Intelligentie-Prac-1\Prac1\bin\Debug\Prac1.pdb
+C:\Users\Wouter\Desktop\Computationele Intelligentie\Computationele-Intelligentie-Prac-1\Prac1\obj\Debug\Prac1.csprojResolveAssemblyReference.cache
+C:\Users\Wouter\Desktop\Computationele Intelligentie\Computationele-Intelligentie-Prac-1\Prac1\obj\Debug\Prac1.exe
+C:\Users\Wouter\Desktop\Computationele Intelligentie\Computationele-Intelligentie-Prac-1\Prac1\obj\Debug\Prac1.pdb
