@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
-
+using System.Timers;
+using System.Diagnostics;
+using System.IO;
 
 namespace Prac1
 {
@@ -12,12 +14,49 @@ namespace Prac1
     {
         static int dims;                        // Dimensions of the sudoku
         static int expansion_type;              // Type of expansion for the state (1-3)
-        static Stack<KeyValuePair<int, Point>> sorted_domain_sizes;
+        static Stack<Point> sorted_domain_sizes;
+
+        //Paths
+        static string inputPath = Directory.GetCurrentDirectory() + "\\input";
+        static string outputPath = Directory.GetCurrentDirectory() + "\\output" + "\\" + DateTime.Now.ToString("h/mm/ss");
+
+        static Stopwatch timer;
+        //Streamreaders
+        static StreamReader reader;
+
+        //Stats
+        static int calls = 0;
+        static string solution;
 
         static void Main(string[] args)
         {
-            // The sudoku to solve, in a string (0 = empty cell)
-            string s1 =
+            //File reading
+            if (!Directory.Exists(inputPath))
+                Directory.CreateDirectory(inputPath);
+            if (!Directory.Exists(outputPath))
+                Directory.CreateDirectory(outputPath);
+
+            try
+            {
+                reader = new StreamReader(inputPath + "\\testFile.txt");
+            }
+            catch
+            {
+                Console.WriteLine("File not found \nPress key to close. . .");
+                Console.Read();
+                Environment.Exit(0);
+
+            }
+            string input = "";
+
+            while (!reader.EndOfStream)
+            {
+                //Read line in file
+                input += reader.ReadLine();
+            }
+
+                // The sudoku to solve, in a string (0 = empty cell)
+                string s1 =
                 "0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0";
             string s2_1, s2_2, s2_3;
             string s3_1, s3_2, s3_3, s3_4, s3_5;
@@ -41,7 +80,8 @@ namespace Prac1
                 "0 0 0 0 0 0 0 0 0 " +
                 "0 0 0 0 0 0 0 0 0 " +
                 "0 0 0 0 0 0 0 0 0";
-            string[] start = s1.Split();
+            //string[] start = s1.Split();
+            string[] start = input.Split();
 
             // Fill a 2D array with the values from the string[] above
             dims = (int)Math.Sqrt(start.Length);
@@ -73,10 +113,13 @@ namespace Prac1
                 domain_sizes.Reverse();
 
                 // Transform it into a stack
-                sorted_domain_sizes = new Stack<KeyValuePair<int, Point>>( domain_sizes );
+                sorted_domain_sizes = new Stack<Point>((from pair in domain_sizes select pair.Value).ToList());
+                
 
             }
 
+            timer = new Stopwatch();
+            timer.Start();
             // Make a stack and put the start_state on top
             Stack<int[,]> stack = new Stack<int[,]>();
             stack.Push(start_state);
@@ -92,14 +135,29 @@ namespace Prac1
                 for (int i = 0; i < dims; i++)
                 {
                     for (int j = 0; j < dims; j++)
+                    {
                         Console.Write(end[i, j] + " ");
+                        solution += end[i, j] + " ";
+                    }
+                        
                     Console.Write("\n");
+                    solution += "\n";
                 }
             }
             // Otherwise, write an appropriate message
             else
                 Console.WriteLine("Could not find a solution");
 
+            //Stats
+            Console.WriteLine("\n\nStatistics:");
+            Console.WriteLine("Amount of recursion calls: " + calls);
+            timer.Stop();
+            Console.WriteLine("Time elapsed: " + timer.Elapsed);
+            Console.WriteLine("Method used: " + expansion_type);
+     
+            //Print results to file
+            string outputString = "Solution:\n\n" + solution + "\nStatistics:\nAmount of recursion calls: " + calls + "\nTime elapsed: " + timer.Elapsed + "\nMethod used: " + expansion_type;
+            File.WriteAllText(outputPath + "\\testOutputResults.txt", outputString);
 
             Console.ReadLine();
         }
@@ -132,6 +190,9 @@ namespace Prac1
 
         static int[,] BackTracking(Stack<int[,]> stack)
         {
+            //Keep yo stats
+            calls++;
+
             if (stack.Count == 0)
                 return null;
             else
@@ -171,7 +232,8 @@ namespace Prac1
                                 
                         }
                     }
-                    sorted_domain_sizes.Push(new KeyValuePair<int, Point>(0, cell));
+                    if(expansion_type == 3)
+                        sorted_domain_sizes.Push(cell);
                 }
             }
             return null;
@@ -212,8 +274,8 @@ namespace Prac1
                 // Take the top value of the list and remove it from the list
                 if (sorted_domain_sizes.Count > 0)
                 {
-                    KeyValuePair<int, Point> cell = sorted_domain_sizes.Pop();
-                    return cell.Value;
+                    Point cell = sorted_domain_sizes.Pop();
+                    return cell;
                 }
             }
             return new Point(-1, -1);
