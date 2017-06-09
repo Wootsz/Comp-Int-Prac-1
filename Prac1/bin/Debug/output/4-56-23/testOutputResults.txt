@@ -12,5 +12,5 @@ Solution:
 
 Statistics:
 Amount of recursion calls: 258
-Time elapsed: 00:00:00.0058405
+Time elapsed: 00:00:00.0059846
 Method used: 3

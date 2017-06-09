@@ -11,6 +11,6 @@ Solution:
 6 9 5 4 1 7 3 8 2 
 
 Statistics:
-Amount of recursion calls: 541
-Time elapsed: 00:00:00.0137771
-Method used: 2
+Amount of recursion calls: 201
+Time elapsed: 00:00:00.0064712
+Method used: 1

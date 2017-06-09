@@ -56,11 +56,12 @@ namespace Prac1
                 input += reader.ReadLine();
             }
 
-            // The sudoku to solve, in a string (0 = empty cell)
+            // The sudoku to solve, in a string format (0 = empty cell)
             string s1 =
             "0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0";
-            
-            string[] start = s1.Split();
+            string s2 = "2 15 0 0 21 4 0 0 25 9 0 0 0 0 0 18 24 0 0 20 3 0 0 8 5 25 20 0 0 14 17 0 0 24 6 0 0 0 0 0 5 8 0 0 1 9 0 0 18 4 0 0 7 23 0 0 3 8 0 0 24 10 0 18 4 0 0 19 21 0 0 2 15 0 0 0 0 24 17 0 0 18 16 0 0 13 19 0 23 2 0 0 7 22 0 0 1 12 0 0 3 4 0 0 0 0 0 0 0 0 0 0 16 0 0 0 0 0 0 0 0 0 0 17 10 15 23 0 0 0 16 6 0 0 0 0 0 20 0 0 0 0 0 4 18 0 0 0 11 14 0 0 21 22 0 10 12 0 0 0 0 0 0 0 0 0 0 0 13 11 0 3 9 0 0 0 0 5 1 0 0 0 4 15 0 0 17 18 3 0 0 25 2 0 0 0 21 24 0 0 8 2 0 0 0 0 0 1 22 0 0 13 6 4 0 0 7 23 0 0 0 0 0 16 25 20 3 0 0 0 0 0 0 0 24 8 0 0 0 10 12 0 0 0 0 0 0 0 13 1 0 0 9 20 0 0 0 0 0 10 1 0 0 0 6 24 0 0 0 0 0 22 14 0 0 0 0 1 21 0 0 0 11 13 0 0 0 0 0 0 0 9 16 0 0 0 4 18 0 0 0 0 0 0 25 3 0 2 18 0 0 0 0 0 0 0 17 10 0 22 23 0 0 0 0 0 0 22 10 0 0 0 14 17 0 0 0 0 0 0 0 21 13 0 0 0 24 6 0 0 0 0 19 18 0 0 0 0 0 15 12 0 0 0 9 11 0 0 0 0 0 10 3 0 0 17 1 0 0 0 0 0 0 0 25 23 0 0 0 24 8 0 0 0 0 0 0 0 10 9 10 18 0 0 0 0 0 15 7 0 0 3 25 16 0 0 23 21 0 0 0 0 0 24 2 0 0 11 9 0 0 0 13 4 0 0 18 2 6 0 0 22 15 0 0 0 5 1 0 0 0 0 2 16 0 21 23 0 0 0 0 0 0 0 0 0 0 0 11 4 0 18 25 0 0 19 25 0 0 0 6 22 0 0 0 0 0 11 0 0 0 0 0 9 10 0 0 0 7 16 21 17 0 0 0 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 0 0 0 9 11 0 0 18 12 0 0 21 23 0 0 19 6 0 8 7 0 0 24 10 0 0 16 5 0 0 0 0 16 4 0 0 9 7 0 0 21 23 0 10 22 0 0 12 20 0 0 25 2 0 0 24 13 0 0 11 18 0 0 20 8 0 0 0 0 0 21 4 0 0 9 1 0 0 3 23 5 22 0 0 23 2 0 0 1 12 0 0 0 0 0 25 15 0 0 8 7 0 0 6 18";
+            string s3 = "0 15 0 1 0 2 10 14 12 0 0 0 0 0 0 0 0 6 3 16 12 0 8 4 14 15 1 0 2 0 0 0 14 0 9 7 11 3 15 0 0 0 0 0 0 0 0 0 4 13 2 12 0 0 0 0 6 0 0 0 0 15 0 0 0 0 0 0 14 1 11 7 3 5 10 0 0 8 0 12 3 16 0 0 2 4 0 0 0 14 7 13 0 0 5 15 11 0 5 0 0 0 0 0 0 9 4 0 0 6 0 0 0 0 0 0 13 0 16 5 15 0 0 12 0 0 0 0 0 0 0 0 9 0 1 12 0 8 3 10 11 0 15 0 2 12 0 11 0 0 14 3 5 4 0 0 0 0 9 0 6 3 0 4 0 0 13 0 0 11 9 1 0 12 16 2 0 0 10 9 0 0 0 0 0 0 12 0 8 0 6 7 12 8 0 0 16 0 0 10 0 13 0 0 0 5 0 0 5 0 0 0 3 0 4 6 0 1 15 0 0 0 0 0 0 9 1 6 0 14 0 11 0 0 2 0 0 0 10 8 0 14 0 0 0 13 9 0 4 12 11 8 0 0 2 0";
+            string[] start = s3.Split();
 
             dims = (int)Math.Sqrt(start.Length);
 
@@ -149,7 +150,13 @@ namespace Prac1
                             start_state[i, j] = new KeyValuePair<int, List<int>>(int.Parse(start[c]), null);
                         c++;
                     }
-            
+
+                // Adjust all domains
+                for (int i = 0; i < dims; i++)
+                    for (int j = 0; j < dims; j++)
+                        if (start_state[i, j].Key != 0)
+                            AdjustDomains(start_state, i, j);
+
                 // Make the stack
                 Stack<KeyValuePair<int, List<int>>[,]> stack = new Stack<KeyValuePair<int, List<int>>[,]>();
                 stack.Push(start_state);
@@ -357,9 +364,6 @@ namespace Prac1
             {
                 KeyValuePair<int, List<int>>[,] state = stack.Pop();
 
-                // Debug
-                WriteState(ToIntArray(state));
-
                 // Check if the current state is a goal state
                 if (Goal(ToIntArray(state)))
                     return state;
@@ -381,18 +385,17 @@ namespace Prac1
                         if (ValidState(ToIntArray(next_state), cell.X, cell.Y))
                         {
                             // Adjust the domains of all cells and check if none of them are empty
-                            KeyValuePair<int, List<int>>[,] adjusted_next_state = AdjustDimensions((KeyValuePair<int, List<int>>[,])next_state.Clone(), n, cell);
+                            KeyValuePair<int, List<int>>[,] next_state_clone = (KeyValuePair<int, List<int>>[,])next_state.Clone();
+                            KeyValuePair<int, List<int>>[,] adjusted_next_state = AdjustDimensions(next_state_clone, n, cell);
                             if (!ExistsEmptyDomain(adjusted_next_state))
                             {
-                                stack.Push(next_state);
+                                stack.Push(adjusted_next_state);
                                 KeyValuePair<int, List<int>>[,] end = ForwardChecking(stack);
                                 if (end != null)
                                     return end;
                             }
                         }
                     }
-                    if (expansion_type == 3)
-                        sorted_domain_sizes.Push(cell);
                 }
             }
             return null;
@@ -401,58 +404,47 @@ namespace Prac1
         static KeyValuePair<int, List<int>>[,] AdjustDimensions(KeyValuePair<int, List<int>>[,] state, int addition, Point location)
         {
             int y = location.Y;
-            int x = 0;
+            int x = location.X;
 
-            state[location.X, location.Y] = new KeyValuePair<int, List<int>>(addition, null);
-
-            for (x = 0; x < dims; x++)
-            {
-                if (x != location.X)
-                {
-                    if (state[x, y].Key == 0)
+            // Adjust the row
+            for (int i = 0; i < dims; i++)
+                if (i != x)
+                    if (state[i, y].Key == 0)
                     {
-                        List<int> newDomain = new List<int>();
-                        newDomain = state[x, y].Value;
-                        newDomain.Remove(addition);
-                        state[x, y] = new KeyValuePair<int, List<int>>(0, newDomain);
+                        int[] newList = new int[dims];
+                        state[i, y].Value.CopyTo(newList);
+                        List<int> new_list = newList.ToList<int>();
+                        new_list.Remove(addition);
+                        state[i, y] = new KeyValuePair<int, List<int>>(0, new_list);
                     }
-                }
-            }
-
-            x = location.X;
-
-            for (y = 0; y < dims; y++)
-            {
-                if (y != location.Y)
-                {
-                    if (state[x, y].Key == 0)
+            // Adjust the column
+            for (int j = 0; j < dims; j++)
+                if (j != y)
+                    if (state[x, j].Key == 0)
                     {
-                        List<int> newDomain = new List<int>();
-                        newDomain = state[x, y].Value;
-                        newDomain.Remove(addition);
-                        state[x, y] = new KeyValuePair<int, List<int>>(0, newDomain);
+                        int[] newList = new int[dims];
+                        state[x,j].Value.CopyTo(newList);
+                        List<int> new_list = newList.ToList<int>();
+                        new_list.Remove(addition);
+                        state[x,j] = new KeyValuePair<int, List<int>>(0, new_list);
                     }
-                }
-            }
 
             // Get the block location and dimensions
             int blockdims = (int)Math.Sqrt(dims);
             int block_x = location.X / blockdims, block_y = location.Y / blockdims;
 
-            // Check the blocks
+            // Adjust the blocks
             for (int i = block_x * blockdims; i < block_x * blockdims + blockdims; i++)
                 for (int j = block_y * blockdims; j < block_y * blockdims + blockdims; j++)
-                    if (!(i == location.X && j == location.Y))
-                    {
+                    if (!(i == x && j == y))
                         if (state[i, j].Key == 0)
                         {
-                            List<int> newDomain = new List<int>();
-                            newDomain = state[i, j].Value;
-                            newDomain.Remove(addition);
-                            state[i, j] = new KeyValuePair<int, List<int>>(0, newDomain);
+                            int[] newList = new int[dims];
+                            state[i, j].Value.CopyTo(newList);
+                            List<int> new_list = newList.ToList<int>();
+                            new_list.Remove(addition);
+                            state[i, j] = new KeyValuePair<int, List<int>>(0, new_list);
                         }
-                    }
-
 
             return state;
         }
@@ -467,6 +459,7 @@ namespace Prac1
             return state2;
         }
 
+        // Checks if there is at least one cell with an empty domain
         static bool ExistsEmptyDomain(KeyValuePair<int, List<int>>[,] state)
         {
             for (int i = 0; i < dims; i++)
@@ -476,14 +469,14 @@ namespace Prac1
             return false;
         }
 
-        // Returns the location 
+        // Returns the location of the cell with the lowest domain size 
         static Point MostConstrainedVariable(KeyValuePair<int, List<int>>[,] state)
         {
             int smallestConstraint = dims + 100;
             Point result = new Point(0, 0);
             for (int x = 0; x < dims; x++)
                 for (int y = 0; y < dims; y++)
-                    if (state[x, y].Value != null)
+                    if (state[x, y].Key == 0)
                     {
                         int stateConstraint = state[x, y].Value.Count;
                         if (stateConstraint < smallestConstraint)
@@ -494,6 +487,55 @@ namespace Prac1
                     }
 
             return result;
+        }
+
+        static void AdjustDomains(KeyValuePair<int, List<int>>[,] field, int x, int y)
+        {
+            int number = field[x, y].Key;
+
+            // Adjust the rows and colums
+            for (int i = 0; i < dims; i++)
+            {
+                if (i != x && field[i, y].Key == 0 && field[i, y].Value.Contains(number))
+                {
+                    int[] newList = new int[dims];
+                    field[i, y].Value.CopyTo(newList);
+                    List<int> new_list = newList.ToList<int>();
+                    new_list.Remove(number);
+                    field[i, y] = new KeyValuePair<int, List<int>>(0, new_list);
+                }
+            }
+            for (int j = 0; j < dims; j++)
+            {
+                if (j != y && field[x, j].Key == 0 && field[x, j].Value.Contains(number))
+                {
+                    int[] newList = new int[dims];
+                    field[x, j].Value.CopyTo(newList);
+                    List<int> new_list = newList.ToList<int>();
+                    new_list.Remove(number);
+                    field[x, j] = new KeyValuePair<int, List<int>>(0, new_list);
+                }
+            }
+
+            // Get the block location and dimensions
+            int blockdims = (int)Math.Sqrt(dims);
+            int block_x = x / blockdims, block_y = y / blockdims;
+
+            // Adjust the blocks
+            for (int i = block_x * blockdims; i < block_x * blockdims + blockdims; i++)
+            {
+                for (int j = block_y * blockdims; j < block_y * blockdims + blockdims; j++)
+                {
+                    if ((i != x && j != y) && field[i, j].Key == 0 && field[i, j].Value.Contains(number))
+                    {
+                        int[] newList = new int[dims];
+                        field[i, j].Value.CopyTo(newList);
+                        List<int> new_list = newList.ToList<int>();
+                        new_list.Remove(number);
+                        field[i, j] = new KeyValuePair<int, List<int>>(0, new_list);
+                    }
+                }
+            }
         }
     }
 
