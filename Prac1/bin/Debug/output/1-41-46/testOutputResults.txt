@@ -1,0 +1,7 @@
+Solution:
+
+
+Statistics:
+Amount of recursion calls: 19
+Time elapsed: 00:00:00.0415847
+Method used: 0
