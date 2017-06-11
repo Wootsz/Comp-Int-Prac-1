@@ -18,14 +18,11 @@ namespace Prac1
         static Stack<Point> sorted_domain_sizes;
 
         //Paths
-        static string inputPath = Directory.GetCurrentDirectory() + "\\input";
         static string outputPath = Directory.GetCurrentDirectory() + "\\output" + "\\" + DateTime.Now.ToString("h/mm/ss");
 
         static bool file;
 
         static Stopwatch timer;
-        //Streamreaders
-        static StreamReader reader;
 
         //Stats
         static int calls = 0;
@@ -34,29 +31,9 @@ namespace Prac1
         static void Main(string[] args)
         {
             //File reading
-            if (!Directory.Exists(inputPath))
-                Directory.CreateDirectory(inputPath);
             if (!Directory.Exists(outputPath))
                 Directory.CreateDirectory(outputPath);
             string domain_output = "";
-            try
-            {
-                reader = new StreamReader(inputPath + "\\testFile.txt");
-            }
-            catch
-            {
-                file = false;
-                Console.WriteLine("File not found\nUsing defalt input");
-
-                //Environment.Exit(0);
-            }
-
-            string input = "";
-
-            //Read line in file
-            if (file)
-                while (!reader.EndOfStream)
-                    input += reader.ReadLine();
 
             // The sudoku to solve, in a string format (0 = empty cell)
 
@@ -90,7 +67,7 @@ namespace Prac1
             string s23 = "0 6 1 0 0 0 8 0 0 0 0 0 3 9 0 0 0 0 0 0 0 0 0 0 0 0 0 0 8 9 0 0 1 0 0 0 5 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 2 0 2 0 0 4 3 0 0 0 0 0 0 0 2 0 0 0 6 0 0 0 0 0 0 0 1 0 0";
 
             //Currenty used input
-            string[] start = s11.Split();
+            string[] start = s12.Split();
 
             //Dimensions
             dims = (int)Math.Sqrt(start.Length);
