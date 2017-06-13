@@ -13,8 +13,9 @@ namespace Prac2
     class Program
     {
         static int dims = 0, block_dims = 0;
-        static int score = 0;
         static List<int> values;
+        static int random_steps = 20;
+        static int plateau_steps = 3;
 
         static void Main(string[] args)
         {
@@ -45,8 +46,8 @@ namespace Prac2
             }
 
             WriteState(start_state);
-            Console.ReadLine();
-            HillClimbing(start_state, row_scores, column_scores);
+            HillClimbing(start_state, row_scores, column_scores, -1, 0);
+            Console.Read();
         }
 
         static void WriteState(int[,] field)
@@ -131,30 +132,38 @@ namespace Prac2
             return score;
         }
 
-        static int[,] HillClimbing(int[,] state, int[] row_scores, int[] column_scores)
+        static int[,] HillClimbing(int[,] state, int[] row_scores, int[] column_scores, int prev_score, int n)
         {
-            if (GetScore(row_scores, column_scores) == 0)
+            Console.WriteLine("Hill Climbing");
+            WriteState(state);
+            int new_score = GetScore(row_scores, column_scores);
+            if (new_score == 0)
                 return state;
+            if (new_score == prev_score)
+                n++;
+            if (n >= plateau_steps)
+                return RandomWalkHillClimbing(state, row_scores, column_scores, random_steps);
 
             Random random = new Random();
             int random_x = random.Next(0, block_dims), random_y = random.Next(0, block_dims);
 
-            SortedDictionary<int, Point[]> switches = new SortedDictionary<int, Point[]>();
+            SortedDictionary<int, List<Point>> switches = new SortedDictionary<int, List<Point>>();
 
             for (int i = random_x * block_dims; i < random_x * block_dims + block_dims; i++)
                 for (int j = random_y; j < random_y * block_dims + block_dims; j++)
                     for (int k = random_x * block_dims; i < random_x * block_dims + block_dims; i++)
                         for (int l = random_y; j < random_y * block_dims + block_dims; j++)
+                            // TODO: CHECK IF FIXED
                             if (!(i == k && j == l)) // && i,j en k,l staan niet al samen in switches
                             {
                                 // Make a new state
                                 int[,] new_state = (int[,])state.Clone();
+
                                 // Switch the values
                                 int v = new_state[i, j];
                                 new_state[i, j] = new_state[k, l];
                                 new_state[k, l] = v;
 
-                                // Calculate the change in score
                                 //Row score
                                 int new_row_score1 = 0, new_row_score2 = 0;
                                 if (j != l)
@@ -171,13 +180,70 @@ namespace Prac2
                                     new_column_score2 = column_scores[k] - ColumnScore(new_state, k);
                                 }
 
+                                // Calculate the change in score
                                 int change_in_score = new_row_score1 + new_row_score2 + new_column_score1 + new_column_score2;
-                                // Add the switch to the switches list
-                                switches.Add(change_in_score, new Point[2] { new Point(i, j), new Point(k, l) });
+                                // Add the switched points to the switches list
+                                if (switches.Keys.Contains(change_in_score))
+                                {
+                                    switches[change_in_score].Add(new Point(i, j));
+                                    switches[change_in_score].Add(new Point(k, l));
+                                }
+                                else
+                                    switches.Add(change_in_score, new List<Point> { new Point(i, j), new Point(k, l) });
+                                
                             }
 
-            Point[] best_switch = switches.First().Value;
-            return null;
+            // Get the best switch
+            List<Point> best_switch = switches.First().Value;
+            // Execute switch
+            Point a = best_switch[0], b = best_switch[1];
+            int v2 = state[a.X, a.Y];
+            state[a.X, a.Y] = state[b.X, b.Y];
+            state[b.X, b.Y] = v2;
+
+            // Calculate new scores for the rows and columns that have changed
+            row_scores[a.Y] = RowScore(state, a.Y);
+            row_scores[b.Y] = RowScore(state, b.Y);
+            column_scores[a.X] = ColumnScore(state, a.X);
+            column_scores[b.X] = ColumnScore(state, b.X);
+
+            return HillClimbing(state, row_scores, column_scores, new_score, n);
+        }
+
+        static int[,] RandomWalkHillClimbing(int[,] state, int[] row_scores, int[] column_scores, int steps)
+        {
+            Console.WriteLine("RANDOM");
+            WriteState(state);
+
+            // End condition
+            if (steps <= 0)
+                HillClimbing(state, row_scores, column_scores, GetScore(row_scores, column_scores), 0);
+
+            // Generate a random block
+            Random random = new Random();
+            int random_x = random.Next(0, block_dims), random_y = random.Next(0, block_dims);
+            // Generate 4 random integers (the coordinates)
+            // TODO: CHECK IF FIXED
+            int random_i = random.Next(random_x * block_dims, random_x * block_dims + block_dims);
+            int random_j = random.Next(random_y * block_dims, random_y * block_dims + block_dims);
+            int random_k = random.Next(random_x * block_dims, random_x * block_dims + block_dims);
+            int random_l = random_k;
+            while (random_l != random_j) // This loop is to make sure you don't switch the same point
+                random_l = random.Next(random_y * block_dims, random_y * block_dims + block_dims);
+
+            // Do the switch with the two random coordinates values
+            int v2 = state[random_i, random_j];
+            state[random_i, random_j] = state[random_k, random_l];
+            state[random_k, random_l] = v2;
+
+            // Calculate new scores for the rows and columns that have changed
+            row_scores[random_j] = RowScore(state, random_j);
+            row_scores[random_l] = RowScore(state, random_l);
+            column_scores[random_i] = ColumnScore(state, random_i);
+            column_scores[random_k] = ColumnScore(state, random_k);
+
+            steps--;
+            return RandomWalkHillClimbing(state, row_scores, column_scores, steps);
         }
     }
 }
