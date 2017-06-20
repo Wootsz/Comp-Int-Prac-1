@@ -14,10 +14,10 @@ namespace Prac2
     {
         static int dims = 0, block_dims = 0;
         static List<int> values;
-        static int random_steps = 20;
+        static int random_steps = 1;
         static int plateau_steps = 3;
         static List<Point> fixed_cells;
-        static List<KeyValuePair<int, int[,]>> local_optima;
+        static Dictionary<int, int[,]> local_optima;
         static Random random = new Random();
 
         static void Main(string[] args)
@@ -38,7 +38,7 @@ namespace Prac2
             // Fil an array (start_array) with values from the puzzel_array and the other needed values in the blocks
             int[,] start_state = new int[dims, dims];
             fixed_cells = new List<Point>();
-            local_optima = new List<KeyValuePair<int, int[,]>>();
+            local_optima = new Dictionary<int, int[,]>();
             FillArray(start_state, puzzel_array);
             FillBlocks(start_state);
 
@@ -50,8 +50,8 @@ namespace Prac2
                 column_scores[i] = ColumnScore(start_state, i);
             }
 
-            RandomWalkHillClimbing(start_state, row_scores, column_scores, 10);
-            //HillClimbing(start_state, row_scores, column_scores, -1, 0);
+            //RandomWalkHillClimbing(start_state, row_scores, column_scores, 10);
+            HillClimbing(start_state, row_scores, column_scores, -1, 0);
             Console.Write("Finished");
             Console.Read();
         }
@@ -160,9 +160,9 @@ namespace Prac2
             if (n >= plateau_steps)
             {
                 // If we are at the same local optimum again, stop the algorithm and return the state
-                if (new_score == local_optima.Last().Key && state == local_optima.Last().Value)
+                if (local_optima.Keys.Contains(new_score))
                     return state;
-                local_optima.Add(new KeyValuePair<int, int[,]>(new_score, state));
+                local_optima.Add(new_score, state);
                 return RandomWalkHillClimbing(state, row_scores, column_scores, random_steps);
             }
             Random random = new Random();
