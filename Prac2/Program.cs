@@ -16,10 +16,12 @@ namespace Prac2
         static List<int> values;
         static int random_steps = 20;
         static int plateau_steps = 3;
+        static List<Point> fixed_cells;
+        static List<int> local_optima;
 
         static void Main(string[] args)
         {
-            string puzzel1 = "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
+            //string puzzel1 = "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
             string puzzel2 = "0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0";
             string[] puzzel_array = puzzel2.Split();
 
@@ -34,6 +36,8 @@ namespace Prac2
 
             // Fil an array (start_array) with values from the puzzel_array and the other needed values in the blocks
             int[,] start_state = new int[dims, dims];
+            fixed_cells = new List<Point>();
+            local_optima = new List<int>();
             FillArray(start_state, puzzel_array);
             FillBlocks(start_state);
 
@@ -45,7 +49,6 @@ namespace Prac2
                 column_scores[i] = ColumnScore(start_state, i);
             }
 
-            WriteState(start_state);
             HillClimbing(start_state, row_scores, column_scores, -1, 0);
             Console.Read();
         }
@@ -56,6 +59,10 @@ namespace Prac2
             {
                 for (int j = 0; j < dims; j++)
                 {
+                    if (fixed_cells.Contains(new Point(i, j)))
+                        Console.ForegroundColor = ConsoleColor.Red;
+                    else
+                        Console.ResetColor();
                     Console.Write(field[i, j] + " ");
                 }
                 Console.WriteLine();
@@ -70,6 +77,8 @@ namespace Prac2
             for (int i = 0; i < dims; i++)
                 for (int j = 0; j < dims; j++)
                 {
+                    if (puzzel_array[c] != "0")
+                        fixed_cells.Add(new Point(i, j));
                     state[i, j] = int.Parse(puzzel_array[c]);
                     c++;
                 }
@@ -82,6 +91,7 @@ namespace Prac2
                 for (int y = 0; y < block_dims; y++)
                 {
                     List<int> block_values = new List<int>(values);
+                    Random random = new Random();
                     // First, determine what values you still need to fill into the block
                     for (int i = x * block_dims; i < x * block_dims + block_dims; i++)
                         for (int j = y * block_dims; j < y * block_dims + block_dims; j++)
@@ -92,8 +102,9 @@ namespace Prac2
                         for (int j = y * block_dims; j < y * block_dims + block_dims; j++)
                             if (state[i, j] == 0)
                             {
-                                state[i, j] = block_values[0];
-                                block_values.RemoveAt(0);
+                                int r = random.Next(block_values.Count);
+                                state[i, j] = block_values[r];
+                                block_values.RemoveAt(r);
                             }
                 }
         }
@@ -134,15 +145,19 @@ namespace Prac2
 
         static int[,] HillClimbing(int[,] state, int[] row_scores, int[] column_scores, int prev_score, int n)
         {
-            Console.WriteLine("Hill Climbing");
             WriteState(state);
             int new_score = GetScore(row_scores, column_scores);
+            // If new_score == 0, it means we have found the solution
             if (new_score == 0)
                 return state;
+            // If the new score is equal to the prev_score, we are at a platuea, so increase n by 1
             if (new_score == prev_score)
                 n++;
+            // If n >= plateasu steps, we are in a local optimum or on a plateau for n steps
             if (n >= plateau_steps)
-                return RandomWalkHillClimbing(state, row_scores, column_scores, random_steps);
+                local_optima.Add(new_score);
+                return state;
+                //return RandomWalkHillClimbing(state, row_scores, column_scores, random_steps);
 
             Random random = new Random();
             int random_x = random.Next(0, block_dims), random_y = random.Next(0, block_dims);
@@ -153,8 +168,7 @@ namespace Prac2
                 for (int j = random_y; j < random_y * block_dims + block_dims; j++)
                     for (int k = random_x * block_dims; i < random_x * block_dims + block_dims; i++)
                         for (int l = random_y; j < random_y * block_dims + block_dims; j++)
-                            // TODO: CHECK IF FIXED
-                            if (!(i == k && j == l)) // && i,j en k,l staan niet al samen in switches
+                            if (!(i == k && j == l) && (!fixed_cells.Contains(new Point(i, j)) || !fixed_cells.Contains(new Point(k, l))))
                             {
                                 // Make a new state
                                 int[,] new_state = (int[,])state.Clone();
@@ -195,8 +209,15 @@ namespace Prac2
 
             // Get the best switch
             List<Point> best_switch = switches.First().Value;
+
+            // TODO
+            // If the new score is worse than the previous one, we are at an optimum
+            if (switches.First().Key > prev_score)
+                return HillClimbing(state, row_scores, column_scores, new_score, n);
+
             // Execute switch
             Point a = best_switch[0], b = best_switch[1];
+            Console.WriteLine("a: " + a + " b: " + b);
             int v2 = state[a.X, a.Y];
             state[a.X, a.Y] = state[b.X, b.Y];
             state[b.X, b.Y] = v2;
