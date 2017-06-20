@@ -17,7 +17,8 @@ namespace Prac2
         static int random_steps = 20;
         static int plateau_steps = 3;
         static List<Point> fixed_cells;
-        static List<int> local_optima;
+        static List<KeyValuePair<int, int[,]>> local_optima;
+        static Random random = new Random();
 
         static void Main(string[] args)
         {
@@ -37,7 +38,7 @@ namespace Prac2
             // Fil an array (start_array) with values from the puzzel_array and the other needed values in the blocks
             int[,] start_state = new int[dims, dims];
             fixed_cells = new List<Point>();
-            local_optima = new List<int>();
+            local_optima = new List<KeyValuePair<int, int[,]>>();
             FillArray(start_state, puzzel_array);
             FillBlocks(start_state);
 
@@ -49,7 +50,9 @@ namespace Prac2
                 column_scores[i] = ColumnScore(start_state, i);
             }
 
-            HillClimbing(start_state, row_scores, column_scores, -1, 0);
+            RandomWalkHillClimbing(start_state, row_scores, column_scores, 10);
+            //HillClimbing(start_state, row_scores, column_scores, -1, 0);
+            Console.Write("Finished");
             Console.Read();
         }
 
@@ -155,10 +158,13 @@ namespace Prac2
                 n++;
             // If n >= plateasu steps, we are in a local optimum or on a plateau for n steps
             if (n >= plateau_steps)
-                local_optima.Add(new_score);
-                return state;
-                //return RandomWalkHillClimbing(state, row_scores, column_scores, random_steps);
-
+            {
+                // If we are at the same local optimum again, stop the algorithm and return the state
+                if (new_score == local_optima.Last().Key && state == local_optima.Last().Value)
+                    return state;
+                local_optima.Add(new KeyValuePair<int, int[,]>(new_score, state));
+                return RandomWalkHillClimbing(state, row_scores, column_scores, random_steps);
+            }
             Random random = new Random();
             int random_x = random.Next(0, block_dims), random_y = random.Next(0, block_dims);
 
@@ -204,14 +210,13 @@ namespace Prac2
                                 }
                                 else
                                     switches.Add(change_in_score, new List<Point> { new Point(i, j), new Point(k, l) });
-                                
+
                             }
 
             // Get the best switch
             List<Point> best_switch = switches.First().Value;
 
-            // TODO
-            // If the new score is worse than the previous one, we are at an optimum
+            // If the new score is worse than the previous one, we are at an optimum, so go into recursion with n = n
             if (switches.First().Key > prev_score)
                 return HillClimbing(state, row_scores, column_scores, new_score, n);
 
@@ -240,31 +245,35 @@ namespace Prac2
             if (steps <= 0)
                 HillClimbing(state, row_scores, column_scores, GetScore(row_scores, column_scores), 0);
 
-            // Generate a random block
-            Random random = new Random();
+            // Generate a random block coordinate
             int random_x = random.Next(0, block_dims), random_y = random.Next(0, block_dims);
-            // Generate 4 random integers (the coordinates)
-            // TODO: CHECK IF FIXED
+            // Generate 4 random integers (the switch coordinates)
+            List<int> r = GetRandomCo(random_x, random_y, block_dims);
+            int i = r[0], j = r[1], k = r[2], l = r[3];
+
+            // Do the switch with the two random coordinates values
+            int v2 = state[i, j];
+            state[i, j] = state[k, l];
+            state[k, l] = v2;
+
+            // Calculate new scores for the rows and columns that have changed
+            row_scores[j] = RowScore(state, j);
+            row_scores[l] = RowScore(state, l);
+            column_scores[i] = ColumnScore(state, i);
+            column_scores[k] = ColumnScore(state, k);
+
+            return RandomWalkHillClimbing(state, row_scores, column_scores, --steps);
+        }
+
+        static List<int> GetRandomCo(int random_x, int random_y, int block_dims)
+        {
             int random_i = random.Next(random_x * block_dims, random_x * block_dims + block_dims);
             int random_j = random.Next(random_y * block_dims, random_y * block_dims + block_dims);
             int random_k = random.Next(random_x * block_dims, random_x * block_dims + block_dims);
-            int random_l = random_k;
-            while (random_l != random_j) // This loop is to make sure you don't switch the same point
-                random_l = random.Next(random_y * block_dims, random_y * block_dims + block_dims);
-
-            // Do the switch with the two random coordinates values
-            int v2 = state[random_i, random_j];
-            state[random_i, random_j] = state[random_k, random_l];
-            state[random_k, random_l] = v2;
-
-            // Calculate new scores for the rows and columns that have changed
-            row_scores[random_j] = RowScore(state, random_j);
-            row_scores[random_l] = RowScore(state, random_l);
-            column_scores[random_i] = ColumnScore(state, random_i);
-            column_scores[random_k] = ColumnScore(state, random_k);
-
-            steps--;
-            return RandomWalkHillClimbing(state, row_scores, column_scores, steps);
+            int random_l = random.Next(random_y * block_dims, random_y * block_dims + block_dims);
+            if ((random_i == random_k && random_j == random_l) || fixed_cells.Contains(new Point(random_i, random_j)) || fixed_cells.Contains(new Point(random_k, random_l)))
+                return GetRandomCo(random_x, random_y, block_dims);
+            return new List<int> { random_i, random_j, random_k, random_l };
         }
     }
 }
