@@ -19,6 +19,7 @@ namespace Prac2
         static List<Point> fixed_cells;
         static Dictionary<int, int[,]> local_optima;
         static Random random = new Random();
+        static int max_hill_iterations = 50;
 
         static void Main(string[] args)
         {
@@ -51,8 +52,8 @@ namespace Prac2
             }
 
             //RandomWalkHillClimbing(start_state, row_scores, column_scores, 10);
-            HillClimbing(start_state, row_scores, column_scores, -1, 0);
-            Console.Write("Finished");
+            Console.WriteLine("Finished");
+            WriteState(HillClimbing(start_state, row_scores, column_scores, -1, 0));
             Console.Read();
         }
 
@@ -148,13 +149,17 @@ namespace Prac2
 
         static int[,] HillClimbing(int[,] state, int[] row_scores, int[] column_scores, int prev_score, int n)
         {
-            WriteState(state);
+            //WriteState(state);
+            if (max_hill_iterations == 0)
+                return state;
+            max_hill_iterations--;
+            
             int new_score = GetScore(row_scores, column_scores);
             // If new_score == 0, it means we have found the solution
             if (new_score == 0)
                 return state;
             // If the new score is equal to the prev_score, we are at a platuea, so increase n by 1
-            if (new_score == prev_score)
+            if (new_score >= prev_score)
                 n++;
             // If n >= plateasu steps, we are in a local optimum or on a plateau for n steps
             if (n >= plateau_steps)
@@ -171,9 +176,14 @@ namespace Prac2
             SortedDictionary<int, List<Point>> switches = new SortedDictionary<int, List<Point>>();
 
             for (int i = random_x * block_dims; i < random_x * block_dims + block_dims; i++)
-                for (int j = random_y; j < random_y * block_dims + block_dims; j++)
+            {
+                for (int j = random_y * block_dims; j < random_y * block_dims + block_dims; j++)
+                {
                     for (int k = random_x * block_dims; i < random_x * block_dims + block_dims; i++)
-                        for (int l = random_y; j < random_y * block_dims + block_dims; j++)
+                    {
+                        for (int l = random_y * block_dims; j < random_y * block_dims + block_dims; j++)
+                        {
+                            // Check if (i, j) != (k, l) and if both aren't in the fixed_cells list
                             if (!(i == k && j == l) && (!fixed_cells.Contains(new Point(i, j)) || !fixed_cells.Contains(new Point(k, l))))
                             {
                                 // Make a new state
@@ -212,7 +222,10 @@ namespace Prac2
                                     switches.Add(change_in_score, new List<Point> { new Point(i, j), new Point(k, l) });
 
                             }
-
+                        }
+                    }
+                }
+            }
             // Get the best switch
             List<Point> best_switch = switches.First().Value;
 
@@ -222,7 +235,7 @@ namespace Prac2
 
             // Execute switch
             Point a = best_switch[0], b = best_switch[1];
-            Console.WriteLine("a: " + a + " b: " + b);
+            //Console.WriteLine("a: " + a + " b: " + b);
             int v2 = state[a.X, a.Y];
             state[a.X, a.Y] = state[b.X, b.Y];
             state[b.X, b.Y] = v2;
@@ -239,11 +252,11 @@ namespace Prac2
         static int[,] RandomWalkHillClimbing(int[,] state, int[] row_scores, int[] column_scores, int steps)
         {
             Console.WriteLine("RANDOM");
-            WriteState(state);
+            //WriteState(state);
 
             // End condition
             if (steps <= 0)
-                HillClimbing(state, row_scores, column_scores, GetScore(row_scores, column_scores), 0);
+                return HillClimbing(state, row_scores, column_scores, GetScore(row_scores, column_scores), 0);
 
             // Generate a random block coordinate
             int random_x = random.Next(0, block_dims), random_y = random.Next(0, block_dims);
