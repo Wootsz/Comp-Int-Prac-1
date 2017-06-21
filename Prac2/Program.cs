@@ -88,7 +88,7 @@ namespace Prac2
             //f
             string s23 = "0 6 1 0 0 0 8 0 0 0 0 0 3 9 0 0 0 0 0 0 0 0 0 0 0 0 0 0 8 9 0 0 1 0 0 0 5 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 2 0 2 0 0 4 3 0 0 0 0 0 0 0 2 0 0 0 6 0 0 0 0 0 0 0 1 0 0";
 
-            string[] puzzel_array = s13.Split();
+            string[] puzzel_array = s25251.Split();
 
 
             //Get mode
@@ -131,8 +131,6 @@ namespace Prac2
                 if (!Directory.Exists(outputPath))
                     Directory.CreateDirectory(outputPath);
 
-            //Populate variables for the first time
-            Reset();
             //Setup first state
             int[,] start_state = init(puzzel_array);
 
@@ -188,6 +186,7 @@ namespace Prac2
 
                     //Save scores
                     solutionScore = GetScore(row_scores, column_scores);
+                    score.Add(solutionScore);
 
                     if (solutionScore == 0)
                     {
@@ -198,8 +197,6 @@ namespace Prac2
                     }
 
                     //Reset
-                    score.Add(solutionScore);
-                    Reset();
                     start_state = init(puzzel_array);
                 }
                 Console.WriteLine("\nIterations: " + iterations + "\n");
@@ -239,7 +236,6 @@ namespace Prac2
                     //Save scores and reset
                     int solutionScore = GetScore(row_scores, column_scores);
                     score.Add(solutionScore);
-                    Reset();
                     start_state = init(puzzel_array);
                     if(solutionScore == 0)
                     {
@@ -277,7 +273,7 @@ namespace Prac2
 
         static int[,] init(string[] puzzel_array)
         {
-
+            Reset();
             // Determine the puzzle dimensions based on the puzzel_array
             dims = (int)Math.Sqrt(puzzel_array.Length);
             block_dims = (int)Math.Sqrt(dims);
