@@ -10,3 +10,9 @@ C:\Users\Robbert\Documents\GitHubVisualStudio\Comp-Int-Prac-1\Prac1\obj\Debug\Pr
 C:\Users\Robbert\Documents\GitHubVisualStudio\Comp-Int-Prac-1\Prac1\bin\Debug\Prac1.exe
 C:\Users\Robbert\Documents\GitHubVisualStudio\Comp-Int-Prac-1\Prac1\bin\Debug\Prac1.pdb
 C:\Users\Robbert\Documents\GitHubVisualStudio\Comp-Int-Prac-1\Prac1\obj\Debug\Prac1.csprojResolveAssemblyReference.cache
+C:\Users\Robbe\Source\Repos\Comp-Int-Prac-1\Prac1\bin\Debug\Prac1.exe.config
+C:\Users\Robbe\Source\Repos\Comp-Int-Prac-1\Prac1\bin\Debug\Prac1.exe
+C:\Users\Robbe\Source\Repos\Comp-Int-Prac-1\Prac1\bin\Debug\Prac1.pdb
+C:\Users\Robbe\Source\Repos\Comp-Int-Prac-1\Prac1\obj\Debug\Prac1.csprojResolveAssemblyReference.cache
+C:\Users\Robbe\Source\Repos\Comp-Int-Prac-1\Prac1\obj\Debug\Prac1.exe
+C:\Users\Robbe\Source\Repos\Comp-Int-Prac-1\Prac1\obj\Debug\Prac1.pdb

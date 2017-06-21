@@ -12,25 +12,99 @@ namespace Prac2
 {
     class Program
     {
+        //Settings
         static int dims = 0, block_dims = 0;
         static List<int> values;
         static Dictionary<int, int[,]> local_optima;
         static List<Point> fixed_cells, full_blocks;
         static Random random = new Random();
 
-        static int random_steps = 10;
+        static int iterations = 100;
+        static int random_steps = 20;
         static int plateau_steps = 3;
         static int max_hill_iterations = 100;
         static int max_hill_iterations_o = max_hill_iterations;
 
+        static int[,] reset_state;
+
         static int hill_steps = 0, random_hill_steps = 0;
+
+        static Stopwatch timer;
+
+        //Output variables
+        static bool output = false;
+        static string outputPath = Directory.GetCurrentDirectory() + "\\output" + "\\" + DateTime.Now.ToString("h/mm/ss");
+        
 
         static void Main(string[] args)
         {
+            
+            //Choose puzzel
             string puzzel1 = "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
             string puzzel2 = "0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0";
             string puzzel0 = "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
-            string[] puzzel_array = puzzel0.Split();
+            string[] puzzel_array = puzzel1.Split();
+
+            timer = new Stopwatch();
+
+            if(output)
+                if (!Directory.Exists(outputPath))
+                    Directory.CreateDirectory(outputPath);
+
+            //Setup first state
+            int[,] start_state = init(puzzel_array);
+
+            // Fill the row and column arrays with scores of each row/column
+            int[] row_scores = new int[dims], column_scores = new int[dims];
+            for (int i = 0; i < dims; i++)
+            {
+                row_scores[i] = RowScore(start_state, i);
+                column_scores[i] = ColumnScore(start_state, i);
+            }
+
+            //Data variables
+            List<int> score = new List<int>();
+            List<double> time = new List<double>();
+
+            //Loop through X amount of iterations
+            for (int i = 0; i < iterations; i++)
+            {
+                //Write progress
+                Console.Write("#");
+
+                //WriteState(start_state);
+                timer.Start();
+                int[,] end = HillClimbing(start_state, row_scores, column_scores, -1, 0);
+
+                //Timer stop and record
+                timer.Stop();
+                time.Add(timer.Elapsed.TotalMilliseconds);
+                timer.Reset();
+
+                //Write states
+                //WriteState(end);
+                //WriteStats(GetScore(row_scores, column_scores));
+
+                //Save scores and reset
+                score.Add(GetScore(row_scores, column_scores));
+                Reset();
+                start_state = init(puzzel_array);
+            }
+
+            //Write output
+            string scoreString = ("\nTotal score: " + score.Sum() + "\nAvg score: " + score.Average() + "\nMax: " + score.Max() + "\nMin :" + score.Min());
+            string timeString = ("\nTotal time(Milliseconds): " + time.Sum() + "\nAvg time: " + time.Average() + "\nMax: " + time.Max() + "\nMin :" + time.Min());
+            Console.WriteLine(scoreString);
+            Console.WriteLine(timeString);
+            if(output)
+                File.WriteAllText(outputPath, scoreString + timeString);
+
+            //Flee you fool
+            Console.Read();
+        }
+
+        static int[,] init(string[] puzzel_array)
+        {
 
             // Determine the puzzle dimensions based on the puzzel_array
             dims = (int)Math.Sqrt(puzzel_array.Length);
@@ -48,20 +122,19 @@ namespace Prac2
             local_optima = new Dictionary<int, int[,]>();
             FillArray(start_state, puzzel_array);
             FillBlocks(start_state);
+            reset_state = start_state;
+            return start_state;
+        }
 
-            // Fill the row and column arrays with scores of each row/column
-            int[] row_scores = new int[dims], column_scores = new int[dims];
-            for (int i = 0; i < dims; i++)
-            {
-                row_scores[i] = RowScore(start_state, i);
-                column_scores[i] = ColumnScore(start_state, i);
-            }
-
-            WriteState(start_state);
-            int[,] end = HillClimbing(start_state, row_scores, column_scores, -1, 0);
-            WriteState(end);
-            WriteStats(GetScore(row_scores, column_scores));
-            Console.Read();
+        static void Reset()
+        {
+            dims = 0;
+            block_dims = 0;
+            random_steps = 20;
+            plateau_steps = 3;
+            max_hill_iterations = max_hill_iterations_o;
+            hill_steps = 0;
+            random_hill_steps = 0;
         }
 
         static void WriteState(int[,] state)
@@ -174,6 +247,9 @@ namespace Prac2
 
         static int[,] HillClimbing(int[,] state, int[] row_scores, int[] column_scores, int prev_score, int n)
         {
+            Dictionary<int, List<Point>> switches;
+            int loops = 0;
+
             if (max_hill_iterations == 0)
                 return state;
             max_hill_iterations--;
@@ -210,15 +286,15 @@ namespace Prac2
             }
             while (full_blocks.Contains(new Point(random_x, random_y)));
 
-            Dictionary<int, List<Point>> switches = new Dictionary<int, List<Point>>();
+            switches = new Dictionary<int, List<Point>>();
 
             for (int i = random_x * block_dims; i < random_x * block_dims + block_dims; i++)
             {
                 for (int j = random_y * block_dims; j < random_y * block_dims + block_dims; j++)
                 {
-                    for (int k = random_x * block_dims; i < random_x * block_dims + block_dims; i++)
+                    for (int k = random_x * block_dims; k < random_x * block_dims + block_dims; k++)
                     {
-                        for (int l = random_y * block_dims; j < random_y * block_dims + block_dims; j++)
+                        for (int l = random_y * block_dims; l < random_y * block_dims + block_dims; l++)
                         {
                             // Check if (i, j) != (k, l) and if both aren't in the fixed_cells list
                             if (!(i == k && j == l) && (!fixed_cells.Contains(new Point(i, j)) || !fixed_cells.Contains(new Point(k, l))))
@@ -250,14 +326,9 @@ namespace Prac2
                                 // Calculate the change in score
                                 int change_in_score = new_row_score1 + new_row_score2 + new_column_score1 + new_column_score2;
 
-                                // Add the switched points to the switches list
-                                if (switches != null && switches.Keys.Contains(change_in_score))
-                                {
-                                    switches[change_in_score].Add(new Point(i, j));
-                                    switches[change_in_score].Add(new Point(k, l));
-                                }
-                                else
-                                    switches.Add(change_in_score, new List<Point> { new Point(i, j), new Point(k, l) });
+                                //Add values to dict
+                                addToDict(switches, change_in_score, new Point(i, j), new Point(k, l));
+
                             }
                         }
                     }
@@ -339,6 +410,19 @@ namespace Prac2
 
             // Return i, j, k and l if these conditions hold. Otherwise recurse and select cell-coordinates
             return new List<int> { random_i, random_j, random_k, random_l };
+        }
+
+        static void addToDict(Dictionary<int, List<Point>> switches, int change_in_score, Point point1, Point point2)
+        {
+            if (switches != null && switches.Keys.Contains(change_in_score))
+            {
+                switches[change_in_score].Add(point1);
+                switches[change_in_score].Add(point2);
+            }
+            else
+            {
+                switches.Add(change_in_score, new List<Point> { point1, point2 });
+            }
         }
     }
 }
