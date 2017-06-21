@@ -1,0 +1,6 @@
+C:\Users\Robbe\Source\Repos\Comp-Int-Prac-1\Prac2\bin\Release\Prac2.exe.config
+C:\Users\Robbe\Source\Repos\Comp-Int-Prac-1\Prac2\bin\Release\Prac2.exe
+C:\Users\Robbe\Source\Repos\Comp-Int-Prac-1\Prac2\bin\Release\Prac2.pdb
+C:\Users\Robbe\Source\Repos\Comp-Int-Prac-1\Prac2\obj\Release\Prac2.exe
+C:\Users\Robbe\Source\Repos\Comp-Int-Prac-1\Prac2\obj\Release\Prac2.pdb
+C:\Users\Robbe\Source\Repos\Comp-Int-Prac-1\Prac2\obj\Release\Prac2.csprojResolveAssemblyReference.cache

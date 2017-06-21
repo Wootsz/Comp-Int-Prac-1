@@ -19,10 +19,11 @@ namespace Prac2
         static List<Point> fixed_cells, full_blocks;
         static Random random = new Random();
 
-        static int iterations = 100;
-        static int random_steps = 20;
-        static int plateau_steps = 3;
-        static int max_hill_iterations = 100;
+        static int iterations = 1000;
+        static int random_steps;
+        static int random_steps_input;
+        static int plateau_steps;
+        static int max_hill_iterations;
         static int max_hill_iterations_o = max_hill_iterations;
 
         static int[,] reset_state;
@@ -31,10 +32,24 @@ namespace Prac2
 
         static Stopwatch timer;
 
+        static bool solutionMode = true;
+
         //Output variables
         static bool output = false;
         static string outputPath = Directory.GetCurrentDirectory() + "\\output" + "\\" + DateTime.Now.ToString("h/mm/ss");
-        
+
+        //Reset all variables to original values
+        //SET HERE ALL WANTED VALUES
+        static void Reset()
+        {
+            dims = 0;
+            block_dims = 0;
+            random_steps = random_steps_input;
+            plateau_steps = 3;
+            max_hill_iterations = 100;
+            hill_steps = 0;
+            random_hill_steps = 0;
+        }
 
         static void Main(string[] args)
         {
@@ -43,14 +58,81 @@ namespace Prac2
             string puzzel1 = "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
             string puzzel2 = "0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0";
             string puzzel0 = "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
-            string[] puzzel_array = puzzel1.Split();
 
+            //a
+            string s25251 = "0 0 12 6 0 0 7 0 18 0 5 24 0 10 1 0 0 4 0 0 0 0 0 0 0 2 0 19 0 13 0 0 0 10 0 0 0 0 0 0 0 0 18 5 0 0 0 0 0 1 0 0 0 0 0 0 0 22 0 0 0 0 3 0 2 0 0 14 12 0 16 8 25 0 0 0 16 0 0 0 2 23 0 0 13 12 22 0 0 0 21 15 19 3 0 0 0 0 14 0 23 0 24 0 0 0 0 0 25 8 4 0 16 19 21 0 0 7 0 0 0 3 12 0 9 0 4 0 2 0 0 0 0 0 0 0 10 0 24 12 17 16 0 0 0 5 0 0 0 0 0 0 9 0 0 6 25 0 0 0 8 0 5 3 0 0 0 0 0 0 20 0 0 18 19 15 0 10 11 0 0 0 18 12 19 0 0 0 0 0 0 0 23 0 0 7 0 0 4 0 0 0 0 0 0 0 0 14 0 22 0 0 18 16 20 0 6 11 13 0 0 0 0 0 0 0 22 0 25 0 0 1 17 5 4 7 0 0 14 0 8 3 21 0 0 11 0 0 0 6 0 20 13 15 0 0 0 0 0 0 9 0 0 2 0 25 0 1 8 0 0 5 0 21 0 0 1 0 0 0 0 16 10 0 7 0 0 4 20 0 0 9 0 0 14 0 24 0 17 0 25 2 5 0 0 0 0 0 13 0 0 0 0 0 22 0 0 0 0 0 19 1 8 0 0 0 0 7 21 0 0 12 0 2 17 0 0 0 18 6 16 0 0 15 0 0 13 0 10 0 8 10 18 12 16 9 0 0 0 5 0 0 0 0 19 0 0 17 0 21 0 15 0 0 22 0 8 0 0 15 0 3 0 6 0 21 0 0 7 0 18 14 5 0 1 0 0 0 0 0 0 0 0 19 0 1 0 16 11 0 0 0 10 22 25 15 0 0 0 0 0 0 21 0 0 0 3 1 0 21 0 0 4 0 0 0 0 2 0 13 0 24 25 0 0 14 0 0 6 0 0 0 0 0 0 0 0 15 0 12 14 0 6 17 24 0 0 0 0 0 0 0 13 0 0 0 5 23 16 4 0 13 24 7 2 0 9 0 0 15 3 0 22 0 0 0 0 0 0 8 0 0 25 20 2 0 19 0 0 0 0 1 0 0 0 0 21 3 0 0 12 0 0 0 0 16 12 0 5 0 11 21 0 23 0 0 15 0 0 0 0 19 9 0 0 0 0 0 25 10 0 0 0 0 9 20 22 7 4 0 3 0 14 25 18 0 11 0 0 0 0 0 1 0 15 24 0 6 0 22 8 0 25 14 0 10 11 0 9 0 20 1 16 0 7 0 23 0 0 13 14 13 21 1 0 0 5 0 0 0 6 0 22 0 23 10 0 0 0 2 0 0 18 7 11";
+            //b
+            string s25252 = "2 15 0 0 21 4 0 0 25 9 0 0 0 0 0 18 24 0 0 20 3 0 0 8 5 25 20 0 0 14 17 0 0 24 6 0 0 0 0 0 5 8 0 0 1 9 0 0 18 4 0 0 7 23 0 0 3 8 0 0 24 10 0 18 4 0 0 19 21 0 0 2 15 0 0 0 0 24 17 0 0 18 16 0 0 13 19 0 23 2 0 0 7 22 0 0 1 12 0 0 3 4 0 0 0 0 0 0 0 0 0 0 16 0 0 0 0 0 0 0 0 0 0 17 10 15 23 0 0 0 16 6 0 0 0 0 0 20 0 0 0 0 0 4 18 0 0 0 11 14 0 0 21 22 0 10 12 0 0 0 0 0 0 0 0 0 0 0 13 11 0 3 9 0 0 0 0 5 1 0 0 0 4 15 0 0 17 18 3 0 0 25 2 0 0 0 21 24 0 0 8 2 0 0 0 0 0 1 22 0 0 13 6 4 0 0 7 23 0 0 0 0 0 16 25 20 3 0 0 0 0 0 0 0 24 8 0 0 0 10 12 0 0 0 0 0 0 0 13 1 0 0 9 20 0 0 0 0 0 10 1 0 0 0 6 24 0 0 0 0 0 22 14 0 0 0 0 1 21 0 0 0 11 13 0 0 0 0 0 0 0 9 16 0 0 0 4 18 0 0 0 0 0 0 25 3 0 2 18 0 0 0 0 0 0 0 17 10 0 22 23 0 0 0 0 0 0 22 10 0 0 0 14 17 0 0 0 0 0 0 0 21 13 0 0 0 24 6 0 0 0 0 19 18 0 0 0 0 0 15 12 0 0 0 9 11 0 0 0 0 0 10 3 0 0 17 1 0 0 0 0 0 0 0 25 23 0 0 0 24 8 0 0 0 0 0 0 0 10 9 10 18 0 0 0 0 0 15 7 0 0 3 25 16 0 0 23 21 0 0 0 0 0 24 2 0 0 11 9 0 0 0 13 4 0 0 18 2 6 0 0 22 15 0 0 0 5 1 0 0 0 0 2 16 0 21 23 0 0 0 0 0 0 0 0 0 0 0 11 4 0 18 25 0 0 19 25 0 0 0 6 22 0 0 0 0 0 11 0 0 0 0 0 9 10 0 0 0 7 16 21 17 0 0 0 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 0 0 0 9 11 0 0 18 12 0 0 21 23 0 0 19 6 0 8 7 0 0 24 10 0 0 16 5 0 0 0 0 16 4 0 0 9 7 0 0 21 23 0 10 22 0 0 12 20 0 0 25 2 0 0 24 13 0 0 11 18 0 0 20 8 0 0 0 0 0 21 4 0 0 9 1 0 0 3 23 5 22 0 0 23 2 0 0 1 12 0 0 0 0 0 25 15 0 0 8 7 0 0 6 18";
+
+            //16x16 tests
+
+            //a
+            string s16161 = "0 15 0 1 0 2 10 14 12 0 0 0 0 0 0 0 0 6 3 16 12 0 8 4 14 15 1 0 2 0 0 0 14 0 9 7 11 3 15 0 0 0 0 0 0 0 0 0 4 13 2 12 0 0 0 0 6 0 0 0 0 15 0 0 0 0 0 0 14 1 11 7 3 5 10 0 0 8 0 12 3 16 0 0 2 4 0 0 0 14 7 13 0 0 5 15 11 0 5 0 0 0 0 0 0 9 4 0 0 6 0 0 0 0 0 0 13 0 16 5 15 0 0 12 0 0 0 0 0 0 0 0 9 0 1 12 0 8 3 10 11 0 15 0 2 12 0 11 0 0 14 3 5 4 0 0 0 0 9 0 6 3 0 4 0 0 13 0 0 11 9 1 0 12 16 2 0 0 10 9 0 0 0 0 0 0 12 0 8 0 6 7 12 8 0 0 16 0 0 10 0 13 0 0 0 5 0 0 5 0 0 0 3 0 4 6 0 1 15 0 0 0 0 0 0 9 1 6 0 14 0 11 0 0 2 0 0 0 10 8 0 14 0 0 0 13 9 0 4 12 11 8 0 0 2 0";
+            //b
+            string s16162 = "0 9 0 0 0 0 0 14 0 6 0 16 0 0 11 0 0 0 0 0 0 0 0 0 3 0 8 0 0 0 1 16 0 0 0 0 12 10 0 11 0 9 0 0 3 0 0 0 0 0 0 0 0 5 6 1 0 10 15 11 0 0 13 0 7 0 9 0 0 3 0 0 0 0 6 1 0 0 15 11 0 12 0 15 7 4 0 13 14 0 2 0 0 0 0 1 0 0 0 0 0 0 10 0 0 0 0 13 14 0 0 0 0 14 3 0 0 0 0 0 0 0 0 0 0 4 0 0 0 0 4 0 8 0 0 0 0 0 5 6 0 0 0 15 0 11 0 0 0 0 0 0 0 0 0 0 1 0 5 0 6 1 0 0 0 0 12 0 0 0 4 0 8 14 0 0 0 0 0 0 6 0 0 0 15 0 0 10 13 7 0 0 9 0 7 0 0 0 0 3 0 0 0 0 0 0 0 0 10 0 0 0 0 13 7 0 0 0 0 0 0 1 0 5 0 0 0 0 10 0 0 12 0 0 0 4 0 0 14 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 4";
+            //c
+            string s16163 = "0 0 0 0 8 0 0 0 0 0 0 0 0 0 0 3 3 0 9 0 0 0 0 0 8 0 0 16 0 0 0 0 0 0 0 6 0 0 9 7 0 0 0 0 0 0 0 0 0 0 0 0 0 12 0 0 0 0 0 0 5 2 0 0 4 5 0 0 0 0 0 11 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 6 0 0 0 0 0 0 0 0 5 0 0 0 0 0 0 11 16 0 0 6 0 0 0 0 3 1 0 0 0 0 0 0 0 0 2 11 0 0 0 0 0 12 0 0 0 0 0 0 0 0 0 14 0 5 0 11 0 8 0 0 0 0 0 0 0 0 0 9 7 0 0 0 0 0 0 11 0 0 10 0 0 0 0 0 0 0 0 9 7 3 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 12 0 0 0 0 0 0 0 0 0 14 0 0 0 0 0 0 0 0 13 12 12 0 0 0 0 0 0 0 0 0 0 0 10 0 0 8 8 0 0 16 0 0 0 0 1 0 0 0 0 14 0 0";
+
+            //9x9 tests
+
+            //a
+            string s11 = "0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 0 8 5 0 0 1 0 2 0 0 0 0 0 0 0 5 0 7 0 0 0 0 0 4 0 0 0 1 0 0 0 9 0 0 0 0 0 0 0 5 0 0 0 0 0 0 7 3 0 0 2 0 1 0 0 0 0 0 0 0 0 4 0 0 0 9";
+            //b
+            string s12 = "0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0";
+            //c
+            string s13 = "0 0 0 1 5 8 0 0 0 0 0 2 0 6 0 8 0 0 0 3 0 0 0 0 0 4 0 0 2 7 0 3 0 5 1 0 0 0 0 0 0 0 0 0 0 0 4 6 0 8 0 7 9 0 0 5 0 0 0 0 0 8 0 0 0 4 0 7 0 1 0 0 0 0 0 3 2 5 0 0 0";
+            //d
+            string s21 = "0 6 9 0 0 0 0 0 0 0 0 0 0 4 0 0 3 0 0 8 0 0 0 0 0 0 0 0 0 0 8 0 0 6 1 0 4 0 0 0 0 0 9 0 0 5 0 0 0 2 0 0 0 0 2 0 0 9 0 0 0 0 5 0 0 0 6 0 1 0 0 0 0 0 0 0 0 0 0 0 0";
+            //e
+            string s22 = "0 0 0 0 0 0 0 1 2 8 0 0 0 4 0 0 0 0 0 0 0 0 0 0 0 6 0 0 9 0 2 0 0 0 0 0 7 0 0 0 0 0 4 0 0 0 0 0 5 0 1 0 0 0 0 1 5 0 0 0 0 0 0 0 0 0 0 3 0 9 0 0 6 0 2 0 0 0 0 0 0";
+            //f
+            string s23 = "0 6 1 0 0 0 8 0 0 0 0 0 3 9 0 0 0 0 0 0 0 0 0 0 0 0 0 0 8 9 0 0 1 0 0 0 5 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 2 0 2 0 0 4 3 0 0 0 0 0 0 0 2 0 0 0 6 0 0 0 0 0 0 0 1 0 0";
+
+            string[] puzzel_array = s13.Split();
+
+
+            //Get mode
+            int invalid = 1;
+            while (invalid == 1)
+            {
+                invalid++;
+                Console.WriteLine("Do you want to use Solution Mode (1) or Iterations Mode (2)?\nEnter 1 or 2:");
+                string[] fc = Console.ReadLine().Split();
+                switch (fc[0])
+                {
+                    case "1": solutionMode = true; break;
+                    case "2": solutionMode = false; break;
+                    default: Console.WriteLine("Invalid input"); invalid--; break;
+                }
+            }
+
+            invalid = 1;
+            while (invalid == 1)
+            {
+                invalid++;
+                Console.WriteLine("How many random steps: (1, 5, 10, 20, 50)");
+                string[] fc = Console.ReadLine().Split();
+                switch (fc[0])
+                {
+                    case "1": random_steps_input = 1; break;
+                    case "5": random_steps_input = 5; break;
+                    case "10": random_steps_input = 10; break;
+                    case "20": random_steps_input = 20; break;
+                    case "50": random_steps_input = 50; break;
+                    default: Console.WriteLine("Invalid input"); invalid--; break;
+                }
+            }
+
+            //Create timer
             timer = new Stopwatch();
 
+            //Create outpot if wanted
             if(output)
                 if (!Directory.Exists(outputPath))
                     Directory.CreateDirectory(outputPath);
 
+            //Populate variables for the first time
+            Reset();
             //Setup first state
             int[,] start_state = init(puzzel_array);
 
@@ -66,34 +148,124 @@ namespace Prac2
             List<int> score = new List<int>();
             List<double> time = new List<double>();
 
-            //Loop through X amount of iterations
-            for (int i = 0; i < iterations; i++)
+            //Find solution or timeout
+            if (solutionMode)
             {
-                //Write progress
-                Console.Write("#");
+                Console.WriteLine("Solution mode:\n");
+                int solutionScore = -1;
 
-                //WriteState(start_state);
-                timer.Start();
-                int[,] end = HillClimbing(start_state, row_scores, column_scores, -1, 0);
+                //Write example start state
+                Console.WriteLine("Example start state:");
+                WriteState(start_state);
 
-                //Timer stop and record
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("Start search...\n");
+                iterations = 0;
+                while (solutionScore != 0)
+                {
+                    if(timer.Elapsed.TotalMinutes >= 5)
+                    {
+                        Console.WriteLine("Solution not found!");
+                        break;
+                    }
+
+                    iterations++;
+
+                    //Write progress
+                    //Console.ForegroundColor = ConsoleColor.Green;
+                    //Console.Write("#");
+                    //Console.ForegroundColor = ConsoleColor.White;
+
+
+                    timer.Start();
+                    int[,] end = HillClimbing(start_state, row_scores, column_scores, -1, 0);
+
+                    //Timer stop and record
+
+                    //Write states
+                    //WriteState(end);
+                    //WriteStats(GetScore(row_scores, column_scores));
+
+                    //Save scores
+                    solutionScore = GetScore(row_scores, column_scores);
+
+                    if (solutionScore == 0)
+                    {
+                        Console.WriteLine("Solution Found!\n\n");
+                        WriteState(end);
+                        WriteStats(GetScore(row_scores, column_scores));
+                        break;
+                    }
+
+                    //Reset
+                    score.Add(solutionScore);
+                    Reset();
+                    start_state = init(puzzel_array);
+                }
+                Console.WriteLine("\nIterations: " + iterations + "\n");
                 timer.Stop();
-                time.Add(timer.Elapsed.TotalMilliseconds);
-                timer.Reset();
-
-                //Write states
-                //WriteState(end);
-                //WriteStats(GetScore(row_scores, column_scores));
-
-                //Save scores and reset
-                score.Add(GetScore(row_scores, column_scores));
-                Reset();
-                start_state = init(puzzel_array);
             }
 
-            //Write output
+            //Save time elapsed till first solution found
+            double timeTillZero = -1;
+
+            //Loop for a certain amount of iterations
+            if (!solutionMode)
+            {
+                Console.WriteLine("Iteration Mode:\n");
+
+                //Write example start state
+                Console.WriteLine("Example start state:");
+                WriteState(start_state);
+
+                //Loop through X amount of iterations
+                for (int i = 0; i < iterations; i++)
+                {
+                    //Write progress
+                    //Console.Write("#");
+
+                    timer.Start();
+                    int[,] end = HillClimbing(start_state, row_scores, column_scores, -1, 0);
+
+                    //Timer stop and record
+                    timer.Stop();
+                    time.Add(timer.Elapsed.TotalMilliseconds);
+                    timer.Reset();
+
+                    //Write states
+                    //WriteState(end);
+                    //WriteStats(GetScore(row_scores, column_scores));
+
+                    //Save scores and reset
+                    int solutionScore = GetScore(row_scores, column_scores);
+                    score.Add(solutionScore);
+                    Reset();
+                    start_state = init(puzzel_array);
+                    if(solutionScore == 0)
+                    {
+                        if(timeTillZero == -1)
+                            timeTillZero = time.Sum();
+                        Console.WriteLine("Solution Found!\n\n");
+                        WriteState(end);
+                        WriteStats(GetScore(row_scores, column_scores));
+                        solutionScore = -1;
+                    }
+                }
+            }
+
+            //Form output
             string scoreString = ("\nTotal score: " + score.Sum() + "\nAvg score: " + score.Average() + "\nMax: " + score.Max() + "\nMin :" + score.Min());
-            string timeString = ("\nTotal time(Milliseconds): " + time.Sum() + "\nAvg time: " + time.Average() + "\nMax: " + time.Max() + "\nMin :" + time.Min());
+            string timeString = "";
+            if (!solutionMode)
+            {
+                timeString = ("\nTotal time(Seconds): " + time.Sum() + "\nAvg time: " + time.Average() + "\nMax: " + time.Max() + "\nMin :" + time.Min());
+                if (timeTillZero != -1)
+                    timeString += ("Time till first solution: " + timeTillZero);
+            }
+            if (solutionMode)
+                timeString = ("\nTotal time till solution(Seconds): " + timer.Elapsed.TotalSeconds);
+
+            //Write output
             Console.WriteLine(scoreString);
             Console.WriteLine(timeString);
             if(output)
@@ -124,17 +296,6 @@ namespace Prac2
             FillBlocks(start_state);
             reset_state = start_state;
             return start_state;
-        }
-
-        static void Reset()
-        {
-            dims = 0;
-            block_dims = 0;
-            random_steps = 20;
-            plateau_steps = 3;
-            max_hill_iterations = max_hill_iterations_o;
-            hill_steps = 0;
-            random_hill_steps = 0;
         }
 
         static void WriteState(int[,] state)
@@ -261,7 +422,7 @@ namespace Prac2
             if (new_score == 0)
                 return state;
             // If the new score is equal to the prev_score, we are at a platuea, so increase n by 1
-            if (new_score >= prev_score)
+            if (new_score == prev_score)
                 n++;
             // If n >= plateasu steps, we are in a local optimum or on a plateau for n steps
             if (n >= plateau_steps)
@@ -273,7 +434,7 @@ namespace Prac2
                     local_optima[new_score] = state;
                 else
                     local_optima.Add(new_score, state);
-                int[,] best_optima = local_optima[local_optima.Keys.Max()];
+                int[,] best_optima = local_optima[local_optima.Keys.Min()];
                 return RandomWalkHillClimbing(best_optima, row_scores, column_scores, random_steps);
             }
 
@@ -339,8 +500,8 @@ namespace Prac2
             List<Point> best_switch = switches[switches.Keys.Max()];//switches.First().Value;
 
             // If the new score is worse than the previous one, we are at an optimum, so go into recursion with n = n
-            if (switches.First().Key > prev_score)
-                return HillClimbing(state, row_scores, column_scores, new_score, n);
+            if (new_score - switches.Keys.Max() > new_score)
+                return HillClimbing(state, row_scores, column_scores, prev_score, plateau_steps);
 
             // Execute switch
             Point a = best_switch[0], b = best_switch[1];
